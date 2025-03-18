@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-flask-app
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: my-flask-app
+  template:
+    metadata:
+      labels:
+        app: my-flask-app
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: my-flask-container
+          image: 271718395217.dkr.ecr.us-east-1.amazonaws.com/chucthien-app:op
+          ports:
+            - containerPort: 5000
+          imagePullPolicy: Always
+          
+      
