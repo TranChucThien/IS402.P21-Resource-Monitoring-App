@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file Dockerfile --tag chucthien-app:latest
 
     - name: Install and update AWS CLI
       run: |
@@ -26,7 +26,10 @@ jobs:
         unzip awscliv2.zip
         sudo ./aws/install --update
     
-    # - name: Configure AWS credentials
-    #   run: |
-    #     mkdir -p ~/.aws
-    #     echo "${{ secrets.AWS_CLI_TOKEN }}" > ~/.aws/credentials
+    - name: Configure AWS credentials
+      run: |
+        mkdir -p ~/.aws
+        echo "${{ secrets.AWS_TOKEN }}" > ~/.aws/credentials
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 271718395217.dkr.ecr.us-east-1.amazonaws.com
+        docker tag chucthien-app:latest 271718395217.dkr.ecr.us-east-1.amazonaws.com/chucthien-app:latest
+        docker push 271718395217.dkr.ecr.us-east-1.amazonaws.com/chucthien-app:latest
