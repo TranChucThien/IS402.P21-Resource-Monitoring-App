@@ -42,6 +42,7 @@ jobs:
     - name: Apply Kubernetes manifests
       run: |
         pwd
-        kubectl delete -f infra/manifest/deployment.yaml
-        kubectl apply -f infra/manifest/deployment.yaml
+        ls
+        kubectl delete -f infra/manifests/deployment.yaml
+        kubectl apply -f infra/manifests/deployment.yaml
         
