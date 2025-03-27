@@ -14,6 +14,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      
 
     - name: Install AWS CLI & kubectl
       run: |
@@ -40,6 +41,7 @@ jobs:
     
     - name: Apply Kubernetes manifests
       run: |
+        pwd
         kubectl delete -f infra/manifest/deployment.yaml
         kubectl apply -f infra/manifest/deployment.yaml
         
