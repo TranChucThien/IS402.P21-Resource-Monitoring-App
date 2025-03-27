@@ -1,0 +1,45 @@
+name: Deploy to EKS
+
+on:
+  workflow_run:
+    workflows: ["Docker Image CI"]
+    types:
+      - completed
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install AWS CLI & kubectl
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y unzip
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install --update
+        sudo apt-get install -y kubectl
+    
+    - name: Configure AWS credentials
+      env:
+        AWS_REGION: us-east-1
+      run: |
+        mkdir -p ~/.aws
+        echo "${{ secrets.AWS_TOKEN1 }}" > ~/.aws/credentials
+    
+    - name: Configure kubectl for EKS
+      env:
+        AWS_REGION: us-east-2
+        CLUSTER_NAME: tct
+      run: |
+        aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+    
+    - name: Apply Kubernetes manifests
+      run: |
+        kubectl delete -f infra/manifest/deployment.yaml
+        kubectl apply -f infra/manifest/deployment.yaml
+        
