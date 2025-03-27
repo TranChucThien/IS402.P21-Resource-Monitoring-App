@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Build Docker image
-      run: docker build . --file Dockerfile --tag chucthien-app:latest
+      run: docker build . --file Dockerfile --tag chucthien-app:op
 
     # - name: Cache Trivy DB
     #   uses: actions/cache@v3
@@ -60,5 +60,5 @@ jobs:
         ECR_REGISTRY: public.ecr.aws/f7b0e1m6
       run: |
         aws ecr-public get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
-        docker tag chucthien-app:latest $ECR_REGISTRY/chucthien:latest
-        docker push $ECR_REGISTRY/chucthien:latest
+        docker tag chucthien-app:op $ECR_REGISTRY/chucthien:op
+        docker push $ECR_REGISTRY/chucthien:op
