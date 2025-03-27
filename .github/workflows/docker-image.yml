@@ -2,34 +2,42 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-    
+    branches: ["main"]
+  workflow_dispatch:
 
 jobs:
-
-  build:
-
+  ci:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Build Docker image
       run: docker build . --file Dockerfile --tag chucthien-app:latest
-
+    
     - name: Install and update AWS CLI
       run: |
         sudo apt-get update
         sudo apt-get install -y unzip
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
-        sudo ./aws/install --update
+        sudo ./aws/install
     
     - name: Configure AWS credentials
+      env:
+        AWS_REGION: us-east-1
       run: |
         mkdir -p ~/.aws
         echo "${{ secrets.AWS_TOKEN }}" > ~/.aws/credentials
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 271718395217.dkr.ecr.us-east-1.amazonaws.com
-        docker tag chucthien-app:latest 271718395217.dkr.ecr.us-east-1.amazonaws.com/chucthien-app:latest
-        docker push 271718395217.dkr.ecr.us-east-1.amazonaws.com/chucthien-app:latest
+    
+    - name: Push Docker image to Public ECR
+      env:
+        AWS_REGION: us-east-1
+        ECR_REGISTRY: public.ecr.aws/f7b0e1m6
+      run: |
+        aws ecr-public get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+        docker tag chucthien-app:latest $ECR_REGISTRY/chucthien:latest
+        docker push $ECR_REGISTRY/chucthien:latest
