@@ -1,0 +1,11 @@
+app:
+  replicaCount: 3
+  image:
+    repository: "chucthien03/resource-monitoring-app"
+    tag: "v2"
+    pullPolicy: "Always"
+  containerPort: 5000
+  service:
+    port: 80
+service:
+  port: 80
